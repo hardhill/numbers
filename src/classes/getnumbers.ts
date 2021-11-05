@@ -7,9 +7,11 @@ export function GetNumbers(st?:number){
     numTwo = {id:2,text:"2",value:2,range:1}
     return {numOne,numTwo}
 }
-export function Compare(n1:INums,n2:INums){
+export function Compare(n1:INums,n2:INums,key:string){
     let result = 0
-    if(n1.value>n2.value){
+    if((n1.value>n2.value)&&key==="ArrowLeft"){
+        result = n1.range
+    }else if((n1.value<n2.value)&&key==="ArrowRight"){
         result = n1.range
     }
     return result

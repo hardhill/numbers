@@ -8,16 +8,16 @@
       {{pretiming}}
     </div>
     <div class="description" v-if="!gaming">
-      <h3>Правила игры:</h3>
-      <p>Выбрать большее число стрелками , если значения равны стрелка вверх или вниз </p>
+      <h2>Правила игры:</h2>
+      <p class="text">Выбрать большее число стрелками <span><ArrowLeftIcon style="height:20px"/></span> или <span><ArrowRightIcon style="height:20px"/></span>, если значения равны стрелка <ArrowDownIcon style="height:20px"/> </p>
     </div>
     <div class="footer">
       <div v-if="!gaming"><button class="bstart" @click="BeginGame">Начали!</button></div>
       <div v-else>
-        <div class="control">
-          <button></button>
-          <button>=</button>
-          <button></button>
+        <div class="control" v-if="activatedKey">
+          <button class="bcursor" @click="PressArrow('ArrowLeft')"><ArrowLeftIcon style="height:20px"/></button>
+          <button class="equle"><MenuAlt4Icon style="height:20px"/></button>
+          <button class="bcursor" @click="PressArrow('ArrowRight')"><ArrowRightIcon style="height:20px"/></button>
         </div>
       </div>
       
@@ -30,9 +30,14 @@ import { defineComponent, onActivated, onMounted, Ref, ref } from 'vue';
 import {INums} from '../classes/Nums'
 import {Compare, GetNumbers} from '../classes/getnumbers'
 import router from '@/router';
+import store from '@/store';
+import { ArrowLeftIcon, ArrowRightIcon, ArrowDownIcon, MenuAlt4Icon } from "@heroicons/vue/outline"
 
 export default defineComponent({
   name: 'Game',
+  components:{
+    ArrowLeftIcon, ArrowRightIcon, ArrowDownIcon, MenuAlt4Icon
+  },
   setup(){
     var stars = 0
     const beginValue = {id:1,text:'_',value:0,range:1}
@@ -42,6 +47,7 @@ export default defineComponent({
     const pretiming = ref(3)
     const numOne:Ref<INums> = ref(beginValue)
     const numTwo:Ref<INums> = ref(beginValue)
+    const activatedKey = ref(false)
     let duration:number = 30
     let intervPre:number
     let intervGame:number
@@ -70,13 +76,24 @@ export default defineComponent({
       },1000)
       // игра пошла
       document.addEventListener("keydown",HookKeys)
-      
-     ShowNumbersPart()
+      activatedKey.value = true
+      ShowNumbersPart()
       
     }
     function HookKeys(event:KeyboardEvent){
-        if(event.key === "ArrowLeft"){
-          let s = Compare(numOne.value,numTwo.value)
+      
+        if(event.key ==="ArrowRight" || event.key === "ArrowLeft")
+        {PressArrow(event.key)
+        }else if(event.key === "ArrowDown"){
+
+          setTimeout(ShowNumbersPart,100)
+        }else if(event.key === "Escape"){
+          console.log("Escape game")
+          duration = 0
+        }
+    }
+    function PressArrow(key:string){
+      let s = Compare(numOne.value,numTwo.value,key)
           if(s>0){
             stars = stars + s
             answerSucc.value = true
@@ -87,25 +104,10 @@ export default defineComponent({
             answerErr.value = true
           }
           setTimeout(ShowNumbersPart,100,stars)
-          
-        }else if(event.key === "ArrowRight"){
-          let s = Compare(numTwo.value,numOne.value) 
-          if(s>0){
-            stars = stars + s
-            answerSucc.value = true
-            answerErr.value = false
-          }else{
-            answerSucc.value = false
-            answerErr.value = true
-          }
-          setTimeout(ShowNumbersPart,100,stars)
-        }else if(event.key === "ArrowDown"){
-          
-          setTimeout(ShowNumbersPart,100)
-        }else if(event.key === "Escape"){
-          console.log("Escape game")
-          duration = 0
-        }
+    }
+    
+    function PressDown(){
+
     }
     function ShowNumbersPart(stage?:number){
       answerSucc.value = false
@@ -121,11 +123,13 @@ export default defineComponent({
       clearInterval(intervGame)
       document.removeEventListener("keydown",HookKeys)
       gaming.value = false
+      activatedKey.value = false
       pretiming.value = 3
       numOne.value = beginValue
       numTwo.value = beginValue
       answerSucc.value = false
       answerErr.value = false
+      store.commit('SET_STARS',stars)
     }
     onMounted(()=>{
       duration = 30
@@ -134,7 +138,7 @@ export default defineComponent({
     onActivated(()=>{
       console.log('activated')
     })
-    return {gaming, BeginGame, pretiming, numOne, numTwo, answerSucc, answerErr, }
+    return {gaming, BeginGame, pretiming, numOne, numTwo, answerSucc, answerErr, PressArrow , activatedKey}
   }
 });
 </script>
@@ -167,7 +171,10 @@ export default defineComponent({
   color: rgb(32, 32, 56);
 }
 .description h3{
-  color: blue;
+  color: rgb(1, 1, 141);
+}
+.description p{
+  font-size: 1.5rem;
 }
 .footer{
   margin-bottom: 2rem;
@@ -178,6 +185,32 @@ export default defineComponent({
 .bstart{
   padding: 1rem 2rem;
   font-size: 2rem;
+  border: solid 2px #107e10;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #caf8ca;
+  cursor: pointer;
+}
+.bcursor{
+  padding: 1rem 2rem;
+  font-size: 2rem;
+  border: solid 2px #89a9e4;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #262ea3;
+  cursor: pointer;
+  color: aliceblue;
+}
+.equle{
+  padding: 1rem 2rem;
+  font-size: 2rem;
+  border: solid 2px #89a9e4;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #0973dd;
+  cursor: pointer;
+  color: aliceblue;
+  margin: 0rem 2rem;
 }
 .control{
   display: flex;
