@@ -13,6 +13,8 @@ export function Compare(n1:INums,n2:INums,key:string){
         result = n1.range
     }else if((n1.value<n2.value)&&key==="ArrowRight"){
         result = n1.range
+    }else if ((n1.value == n2.value) && key === "ArrowDown"){
+        result = n1.range
     }
     return result
 }

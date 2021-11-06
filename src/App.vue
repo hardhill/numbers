@@ -1,6 +1,6 @@
 <template>
   <div id="nav">
-    <h1>NUMBERS</h1>
+    <h1>Сalculate!</h1>
   </div>
   <router-view/>
 </template>
