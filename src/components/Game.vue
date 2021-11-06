@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <div class="time"><Timer ref="timer" @start="hookStartTimer" @stop="hookStopTimer"/></div>
     <div class="tablo" :class="{'success':answerSucc,'error':answerErr}">
       <div class="number">{{numOne.text}}</div>
       <div class="number">{{numTwo.text}}</div>
@@ -15,12 +16,12 @@
       v-if="!gaming"
     >
       <h2>Правила игры:</h2>
-      <p class="text">Выбрать большее число клавишей <span>
-          <ArrowLeftIcon style="height:20px" />
+      <p class="text">Выбрать большее значение справа или слева клавишей <span>
+          <ArrowLeftIcon style="height:20px; color:green" />
         </span> или <span>
-          <ArrowRightIcon style="height:20px" />
-        </span>, если значения равны клавиша
-        <ArrowDownIcon style="height:20px" />
+          <ArrowRightIcon style="height:20px; color:green" />
+        </span>. Если показанные значения между собой равны, нажмите клавишу
+        <ArrowDownIcon style="height:20px; color:green" />
       </p>
     </div>
     <div class="footer">
@@ -81,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onActivated, onMounted, reactive, Ref, ref } from "vue";
+import { computed, defineComponent, onActivated, onMounted, Ref, ref } from "vue";
 import { INums } from "../classes/Nums";
 import { Compare, GetNumbers } from "../classes/getnumbers";
 import router from "@/router";
@@ -93,7 +94,7 @@ import {
   MenuAlt4Icon,
   XIcon
 } from "@heroicons/vue/outline";
-
+import Timer from './Timer.vue'
 export default defineComponent({
   name: "Game",
   components: {
@@ -101,11 +102,11 @@ export default defineComponent({
     ArrowRightIcon,
     ArrowDownIcon,
     MenuAlt4Icon,
-    XIcon
+    XIcon, Timer
   },
-  setup() {
-    
-    const beginValue = { id: 1, text: "_", value: 0, range: 1 };
+  setup(props,context) {
+    const timer:Ref<any> = ref(null)
+    const beginValue = { id: 0, text: " ", value: 0, range: 0 };
     const answerSucc = ref(false);
     const answerErr = ref(false);
     const gaming = ref(false);
@@ -117,9 +118,13 @@ export default defineComponent({
     var stars:Ref<number> = ref(0);
     let duration: number = 30;
     let intervPre: number;
-    let intervGame: number;
-    let intervShow: number;
+    
+    
+    const counter = computed(()=>{
+
+    })
     function BeginGame() {
+     
       gaming.value = true;
       intervPre = setInterval(() => {
         pretiming.value -= 1;
@@ -129,23 +134,23 @@ export default defineComponent({
         }
       }, 1000);
     }
+
     function MainPart() {
-      // старт часов
-      duration = 30;
-      intervGame = setInterval(() => {
-        duration -= 1;
-        //console.log(duration)
-        if (duration <= 0) {
-          EndGame();
-          clearInterval(intervGame);
-          // показать результаты
-          endGame.value = true
-        }
-      }, 1000);
+      //старт таймера
+      timer.value.setTimer(30)
+      timer.value.startTimer()
+    }
+
+    function hookStartTimer(){
       // игра пошла
       document.addEventListener("keydown", HookKeys);
       activatedKey.value = true;
       ShowNumbersPart();
+    }
+    function hookStopTimer(){
+      EndGame();
+      // показать результаты
+      endGame.value = true
     }
     function HookKeys(event: KeyboardEvent) {
       if (
@@ -155,8 +160,7 @@ export default defineComponent({
       ) {
         PressArrow(event.key);
       } else if (event.key === "Escape") {
-        console.log("Escape game");
-        duration = 0;
+        timer.value.stopTimer()
       }
     }
     function PressArrow(key: string) {
@@ -171,7 +175,6 @@ export default defineComponent({
       }
       setTimeout(ShowNumbersPart, 100, stars);
     }
-
     
     function ShowNumbersPart(stage?: number) {
       answerSucc.value = false;
@@ -180,11 +183,9 @@ export default defineComponent({
       numOne.value = nums.numOne;
       numTwo.value = nums.numTwo;
     }
+    
     function EndGame() {
       // концовка игры
-      console.log("Game over");
-      clearInterval(intervShow);
-      clearInterval(intervGame);
       document.removeEventListener("keydown", HookKeys);
       gaming.value = false;
       activatedKey.value = false;
@@ -195,12 +196,7 @@ export default defineComponent({
       answerErr.value = false;
       store.commit("SET_STARS", stars);
     }
-    onMounted(() => {
-      duration = 30;
-    });
-    onActivated(() => {
-      console.log("activated");
-    });
+    
     return {
       gaming,
       BeginGame,
@@ -210,9 +206,10 @@ export default defineComponent({
       answerSucc,
       answerErr,
       PressArrow,
+      hookStartTimer,hookStopTimer,
       activatedKey,
       endGame,
-      stars
+      stars, counter, timer
     };
   },
 });
@@ -222,14 +219,24 @@ export default defineComponent({
 <style scoped>
 .hello {
   position: relative;
-  min-width: 640px;
+  min-width: 580px;
+  max-width: 720px;
   min-height: 400px;
   margin: 0 auto;
   height: 100%;
+  
+}
+.time{
+  position: absolute;
+  top: -4rem;
+  right:1rem;
 }
 .tablo {
   display: flex;
   justify-content: space-around;
+}
+p{
+  padding: 0 2rem;
 }
 .tablo-result {
   position: absolute;
