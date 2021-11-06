@@ -145,7 +145,7 @@ export default defineComponent({
       // игра пошла
       document.addEventListener("keydown", HookKeys);
       activatedKey.value = true;
-      ShowNumbersPart();
+      ShowNumbersPart(1);
     }
     function hookStopTimer(){
       EndGame();
@@ -173,13 +173,13 @@ export default defineComponent({
         answerSucc.value = false;
         answerErr.value = true;
       }
-      setTimeout(ShowNumbersPart, 100, stars);
+      setTimeout(ShowNumbersPart, 100, stars.value);
     }
     
-    function ShowNumbersPart(stage?: number) {
+    function ShowNumbersPart(stars: number) {
       answerSucc.value = false;
       answerErr.value = false;
-      const nums = GetNumbers(stage);
+      const nums = GetNumbers(stars);
       numOne.value = nums.numOne;
       numTwo.value = nums.numTwo;
     }
@@ -194,7 +194,8 @@ export default defineComponent({
       numTwo.value = beginValue;
       answerSucc.value = false;
       answerErr.value = false;
-      store.commit("SET_STARS", stars);
+      stars.value = 1
+      
     }
     
     return {
