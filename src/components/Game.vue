@@ -124,7 +124,7 @@ export default defineComponent({
 
     })
     function BeginGame() {
-     
+      stars.value = 1
       gaming.value = true;
       intervPre = setInterval(() => {
         pretiming.value -= 1;
@@ -173,6 +173,7 @@ export default defineComponent({
         answerSucc.value = false;
         answerErr.value = true;
       }
+      console.log(stars.value)
       setTimeout(ShowNumbersPart, 100, stars.value);
     }
     
@@ -194,7 +195,7 @@ export default defineComponent({
       numTwo.value = beginValue;
       answerSucc.value = false;
       answerErr.value = false;
-      stars.value = 1
+      
       
     }
     
