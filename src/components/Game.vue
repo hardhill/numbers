@@ -75,6 +75,14 @@
               <td class="dcap">Очки</td>
               <td>{{stars}}</td>
             </tr>
+            <tr>
+              <td class="dcap">Верно</td>
+              <td>{{answers}}</td>
+            </tr>
+            <tr>
+              <td class="dcap">Ошибок</td>
+              <td>{{errors}}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -116,6 +124,8 @@ export default defineComponent({
     const activatedKey = ref(false);
     const endGame = ref(false);
     var stars:Ref<number> = ref(0);
+    var answers:Ref<number> = ref(0)
+    var errors:Ref<number> = ref(0)
     let duration: number = 30;
     let intervPre: number;
     
@@ -125,6 +135,8 @@ export default defineComponent({
     })
     function BeginGame() {
       stars.value = 1
+      answers.value = 0
+      errors.value = 0
       gaming.value = true;
       intervPre = setInterval(() => {
         pretiming.value -= 1;
@@ -137,7 +149,7 @@ export default defineComponent({
 
     function MainPart() {
       //старт таймера
-      timer.value.setTimer(30)
+      timer.value.setTimer(50)
       timer.value.startTimer()
     }
 
@@ -166,14 +178,17 @@ export default defineComponent({
     function PressArrow(key: string) {
       let s = Compare(numOne.value, numTwo.value, key);
       if (s > 0) {
+        answers.value ++
         stars.value = stars.value + s;
         answerSucc.value = true;
         answerErr.value = false;
       } else {
+        stars.value = (stars.value + s)<0?0:(stars.value + s)
+        errors.value ++
         answerSucc.value = false;
         answerErr.value = true;
       }
-      console.log(stars.value)
+      
       setTimeout(ShowNumbersPart, 100, stars.value);
     }
     
@@ -183,6 +198,8 @@ export default defineComponent({
       const nums = GetNumbers(stars);
       numOne.value = nums.numOne;
       numTwo.value = nums.numTwo;
+      console.log(numOne.value.text, numTwo.value.text)
+      console.log(numOne.value.value, numTwo.value.value)
     }
     
     function EndGame() {
@@ -211,7 +228,7 @@ export default defineComponent({
       hookStartTimer,hookStopTimer,
       activatedKey,
       endGame,
-      stars, counter, timer
+      stars, counter, timer, answers, errors
     };
   },
 });
