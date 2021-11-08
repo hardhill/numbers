@@ -82,7 +82,7 @@ export function GetNumbers(st:number){
             numOne = GenerateDec2()
             numTwo = GenerateMult1()
         }
-    }else if (st>=50&&st<100){
+    }else if (st>=50&&st<1000){
         if(RandBool()){
             numOne = GenerateDiv1()
             numTwo = GenerateDec1()
