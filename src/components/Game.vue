@@ -126,7 +126,8 @@ export default defineComponent({
     var stars:Ref<number> = ref(0);
     var answers:Ref<number> = ref(0)
     var errors:Ref<number> = ref(0)
-    let duration: number = 30;
+    var rating:Ref<number> = ref(0)
+    
     let intervPre: number;
     
     
@@ -134,7 +135,7 @@ export default defineComponent({
 
     })
     function BeginGame() {
-      stars.value = 1
+      stars.value = rating.value
       answers.value = 0
       errors.value = 0
       gaming.value = true;
@@ -157,7 +158,7 @@ export default defineComponent({
       // игра пошла
       document.addEventListener("keydown", HookKeys);
       activatedKey.value = true;
-      ShowNumbersPart(1);
+      ShowNumbersPart(stars.value);
     }
     function hookStopTimer(){
       EndGame();
@@ -198,8 +199,7 @@ export default defineComponent({
       const nums = GetNumbers(stars);
       numOne.value = nums.numOne;
       numTwo.value = nums.numTwo;
-      console.log(numOne.value.text, numTwo.value.text)
-      console.log(numOne.value.value, numTwo.value.value)
+      
     }
     
     function EndGame() {
@@ -212,10 +212,22 @@ export default defineComponent({
       numTwo.value = beginValue;
       answerSucc.value = false;
       answerErr.value = false;
-      
+      rating.value = stars.value
+      localStorage.setItem("rating", rating.value.toString())
       
     }
-    
+    onMounted(()=>{
+    let n=1  
+     var store:any = localStorage.getItem('rating')
+     
+     try{
+       let n = parseInt(store)
+     }catch(e){
+       console.log(e)
+     }
+     rating.value = n 
+    })
+
     return {
       gaming,
       BeginGame,

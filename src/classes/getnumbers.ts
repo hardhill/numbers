@@ -66,7 +66,7 @@ export function GetNumbers(st:number){
             numOne = GenerateDec1()
             numTwo = GenerateSum1()
         }
-    }else if(st>=30&&st<60){
+    }else if(st>=30&&st<40){
         if(RandBool()){
             numOne = GenerateSum2()
             numTwo = GenerateDec2()
@@ -74,7 +74,24 @@ export function GetNumbers(st:number){
             numOne = GenerateDec2()
             numTwo = GenerateSum2()
         }
+    }else if(st>=40&&st<50){
+        if(RandBool()){
+            numOne = GenerateMult1()
+            numTwo = GenerateDec2()
+        } else{
+            numOne = GenerateDec2()
+            numTwo = GenerateMult1()
+        }
+    }else if (st>=50&&st<100){
+        if(RandBool()){
+            numOne = GenerateDiv1()
+            numTwo = GenerateDec1()
+        } else{
+            numOne = GenerateDec1()
+            numTwo = GenerateDiv1()
+        }
     }
+
 
     return {numOne,numTwo}
 }
@@ -130,11 +147,38 @@ function GenerateDec2():INums{
     let txt = p.toString()+"-"+m.toString()
     return {value:sum, text:txt}
 }
+function GenerateMult1(){
+    const result:number = RandInt(11,21)
+    let n:number = RandInt(2,10)
+    let c:number = result % n
+    let m = (result-c)/n
+    // console.log('Result:',result, 'n:',n,'c:',c,'m:',m)
+    
+    let txt1:string = RandBool()? n.toString() + "*" + m.toString():m.toString()+"*"+n.toString()
+   
+    if(c>0){
+        var txt:string = RandBool() ? txt1 + "+" + c.toString() : c.toString() + "+" + txt1
+    }else{
+        var txt = txt1
+    }
+    
+    return {value:result,text:txt}
+}
+function GenerateDiv1(){
+    const result = RandInt(2,11)
+    let d = RandInt(2,10)
+    let c = RandInt(1,11)
+    let n = (result + c) * d
+    let txt = "("+n.toString()+"/"+d.toString()+") - "+c.toString()
+    return {value:result,text:txt}
+}
 
+
+//=======================================================================================================================================
 function RandInt(min:number, max:number){
      return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function RandBool(){
+function RandBool():boolean{
     return Math.random()>0.5
 }
